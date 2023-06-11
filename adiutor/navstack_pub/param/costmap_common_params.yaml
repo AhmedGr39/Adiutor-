@@ -1,0 +1,34 @@
+obstacle_range: 10
+raytrace_range: 10
+footprint: [[-0.275, -0.18], [-0.275, 0.18], [0.275, 0.18], [0.275, -0.18]]
+map_topic: /map
+subscribe_to_updates: true
+global_frame: odom
+robot_base_frame: base_link
+update_frequency: 5.0
+publish_frequency: 5.0
+rolling_window: true
+
+plugins:
+  - {name: static_layer, type: "costmap_2d::StaticLayer"}
+  - {name: obstacle_layer, type: "costmap_2d::ObstacleLayer"}
+  - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
+
+static_layer:
+  map_topic: /map
+  subscribe_to_updates: true
+
+obstacle_layer:
+  observation_sources: scan 
+  scan:
+    sensor_frame: laser
+    data_type: LaserScan
+    topic: scan
+ 
+ # scan2:
+ #  sensor_frame: laser2
+#  data_type: LaserScan
+#   topic: scan2
+
+inflation_layer: #The value is set to 0.2 meters, indicating that the inflation layer will extend up to 0.2 meters around obstacles in the costmap.
+  inflation_radius: 0.2

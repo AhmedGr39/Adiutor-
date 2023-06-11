@@ -1,0 +1,9 @@
+To install:
+ sudo apt-get install ros-noetic-navigation
+  sudo apt-get install ros-noetic-tf2-sensor-msgs (inside /navigation/ costmap_2d because its missing, cant catkin_make)
+
+ sudo apt-get install ros-noetic-map-server
+ sudo apt-get install ros-noetic-amcl
+ sudo apt-get install ros-noetic-move-base
+
+

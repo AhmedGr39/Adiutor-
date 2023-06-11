@@ -1,0 +1,110 @@
+<launch>
+
+
+ <!-- Transformation between /odom and /base_link -->
+<node pkg="tf" type="static_transform_publisher" name="odom_to_base_link" args="0 0 0 0 0 0 odom base_footprint 10" />
+
+ <!-- Transformation Configuration ... Setting Up the Relationships Between Coordinate Frames --> 
+ <node pkg="tf" type="static_transform_publisher" name="base_link_to_laser" args="0 0 0 0 0 0 base_link laser 30" />
+ <node pkg="tf" type="static_transform_publisher" name="laser_to_laser2" args="0.2 0 0 300 0 0 laser laser2 10" /> 
+ <node pkg="tf" type="static_transform_publisher" name="laser_to_laser1" args="-0.2 0 0 0 0 0 laser laser1 10" />
+
+ <!-- base_footprint -> base_link is a static transform.  we assume that the origin of the base_link coordinate frame (i.e. center of the robot) is located 0.09 meters above its footprint. -->
+<node pkg="tf" type="static_transform_publisher" name="base_footprint_to_base_link" args="0 0 0.135 0 0 0 base_footprint base_link 10" />
+
+ <!-- odom to base_footprint transform will be provided by the robot_pose_ekf node -->
+  <!-- map to odom will be provided by the AMCL -->
+<node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0.26 0.13 0.27 0 0 0 map odom 30" /> 
+ 
+
+ <!-- Lidar Data Publisher-->
+ <!--Publishes: /scan which is /scan1 and /scan2 merged-->
+  <include file="$(find navstack_pub)/launch/multi_scan.launch"/>
+
+ <!-- gmapping node-->
+ <!--Publishes: /map /...-->
+ <!-- Subscribes: /tf & /scan -->
+  <include file="$(find gmapping)/launch/gmapping.launch"/> 
+
+
+  <!-- Extended Kalman Filter from robot_pose_ekf Node-->
+  <!-- Subscribe: /odom, /vo -->
+  <!-- Publish: /robot_pose_ekf/odom_combined -->
+   <node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
+    <param name="output_frame" value="odom"/>
+    <param name="base_footprint_frame" value="base_footprint"/>
+    <param name="freq" value="30.0"/>
+    <param name="sensor_timeout" value="1.0"/>
+    <param name="odom_used" value="true"/>
+    <param name="imu_used" value="false"/>
+    <param name="vo_used" value="false"/>
+    <param name="gps_used" value="false"/>
+    <param name="debug" value="false"/>
+    <param name="self_diagnose" value="true"/>
+   </node>
+	
+   <!-- Odom publish from a node that generates random odom -->
+<!-- 
+    <node pkg="navstack_pub" type="wheel_odometry_node" name="wheels_odometry_node"> 
+   </node> 
+-->
+
+   <!-- Initial Pose and Goal Publisher -->
+   <!-- Publish: /initialpose, /move_base_simple/goal -->
+   <node pkg="rviz" type="rviz" name="rviz" args="-d /home/ahmed39/catkin_ws/src/adiutor/navstack_pub/maps/floorplan4.rviz">
+   </node> 
+
+   <!-- Subscribe: /initialpose, /move_base_simple/goal -->
+   <!-- Publish: /initial_2d, /goal_2d --> 
+   <node pkg="localization_data_pub" type="rviz_click_to_2d" name="rviz_click_to_2d">
+   </node>  
+
+   <!-- Map File -->
+ <!--  <arg name="map_file" default="$(find navstack_pub)/maps/maze_map.yaml"/>  
+-->
+
+   <!-- The map_server node is responsible for loading and serving the map file specified in the args attribute. 
+   It publishes the map data on the /map topic and the map metadata on the /map_metadata topic. -->
+   <!-- Publish: /map, /map_metadata -->
+ <!--  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" respawn="true" /> 
+-->
+
+   <!-- Add AMCL example for differential drive robots for Localization -->
+   <!-- Subscribe: /scan, /tf, /initialpose, /map -->
+   <!-- Publish: /amcl_pose, /particlecloud, /tf -->
+ <!--   <include file="$(find amcl)/examples/amcl_diff.launch"/> -->
+
+   <node pkg="amcl" type="amcl" name="amcl" output="screen">
+   <param name="map_topic" value="/map"/>
+    <remap from="scan" to="scan"/>
+    <param name="odom_frame_id" value="odom"/>
+    <param name="odom_model_type" value="diff-corrected"/>
+    <param name="base_frame_id" value="base_link"/>
+    <param name="update_min_d" value="0.1"/>
+    <param name="update_min_a" value="0.2"/>
+    <param name="min_particles" value="500"/>
+    <param name="global_frame_id" value="map"/>
+    <param name="tf_broadcast" value="true" />
+    <param name="initial_pose_x" value="0.0"/>
+    <param name="initial_pose_y" value="0.0"/>
+    <param name="initial_pose_a" value="0.0"/>
+   </node>
+
+
+   <!-- Move Base Node -->
+   <!-- Subscribe: /move_base_simple/goal -->
+   <!-- Publish: /cmd_vel -->
+   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+   <param name="map_topic" value="/map"/>
+    <rosparam file="$(find navstack_pub)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find navstack_pub)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find navstack_pub)/param/local_costmap_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find navstack_pub)/param/global_costmap_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find navstack_pub)/param/dwa_local_planner_params.yaml" command="load" />
+   <!-- <rosparam file="$(find navstack_pub)/param/base_local_planner_params.yaml" command="load" /> -->
+   </node>
+
+
+</launch>
+
+

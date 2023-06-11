@@ -1,0 +1,37 @@
+
+
+DWAPlannerROS:
+  # Robot configuration parameters
+  acc_lim_x: 2.5       # Maximum acceleration limit in the x direction (m/s^2)
+  acc_lim_y: 0         # Maximum acceleration limit in the y direction (m/s^2)
+  acc_lim_theta: 3.2   # Maximum acceleration limit in the angular direction (rad/s^2)
+  max_trans_vel: 0.5   # Maximum translational velocity (m/s)
+  min_trans_vel: 0.1   # Minimum translational velocity (m/s)
+  max_vel_x: 0.5       # Maximum velocity in the x direction (m/s)
+  min_vel_x: 0.1       # Minimum velocity in the x direction (m/s)
+  max_rot_vel: 1.0     # Maximum rotational velocity (rad/s)
+  min_rot_vel: 0.4     # Minimum rotational velocity (rad/s)
+  acc_limit_trans: 0.4 # Acceleration limit in the x direction for the controller (m/s^2)
+  acc_limit_rot: 0.8   # Acceleration limit in the angular direction for the controller (rad/s^2)
+  sim_time: 1.0        # Simulation time for trajectory generation (s)
+  sim_granularity: 0.025 # Simulation granularity (m)
+  angular_sim_granularity: 0.025 # Angular simulation granularity (rad)
+  vx_samples: 20       # Number of samples to use when exploring the x velocity space
+  vtheta_samples: 40   # Number of samples to use when exploring the rotational velocity space
+  path_distance_bias: 32.0  # Bias for the path distance term in trajectory scoring
+  goal_distance_bias: 24.0  # Bias for the goal distance term in trajectory scoring
+  occdist_scale: 0.01       # Scaling factor for the obstacle distance term in trajectory scoring
+  heading_lookahead: 0.325  # Lookahead time for heading score calculation (s)
+  oscillation_reset_dist: 0.05  # Distance the robot must travel before oscillation flags are reset (m)
+  escape_reset_dist: 0.1   # Distance the robot must travel before escape flags are reset (m)
+  escape_reset_theta: 0.1  # Change in heading required before escape flags are reset (rad)
+  holonomic_robot: false   # Set to true if the robot is holonomic
+  pdist_scale: 0.75        # Proportional scaling factor for the path distance term in trajectory scoring
+  gdist_scale: 0.8         # Proportional scaling factor for the goal distance term in trajectory scoring
+  meter_scoring: true      # Set to true if using meters for scoring, false for cells
+  publish_cost_grid_pc: true  # Set to true to publish the cost grid as a PointCloud
+  heading_scoring: true    # Set to true to allow the robot to pivot in place
+  heading_scoring_timestep: 0.1  # Time between heading score calculations (s)
+  simple_attractor: false  # Set to true to enable simple attractor mode
+  publish_traj_pc: true    # Set to true to publish the trajectory as a PointCloud
+  use_dwa: true            # Set to true to use the Dynamic Window Approach

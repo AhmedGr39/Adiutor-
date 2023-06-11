@@ -1,0 +1,29 @@
+
+
+
+2D Pose Estimate button
+
+    Published Topic: initialpose
+    Type: geometry_msgs/PoseWithCovarianceStamped
+    Description: Allows the user to initialize the localization system used by the navigation stack by setting the pose of the robot in the world.
+
+2D Nav Goal button
+
+    Published Topic: move_base_simple/goal
+    Type: geometry_msgs/PoseStamped
+    Description: Allows the user to send a goal to the navigation by setting a desired pose for the robot to achieve.
+
+However, a lot of the programs we write in ROS need the initial pose and goal destination in a specific format. THe RViz buttons I mentioned above publish the pose and goal destination using the following format:
+
+    /initialpose (geometry_msgs/PoseWithCovarianceStamped)
+    /move_base_simple/goal (geometry_msgs/PoseStamped)
+
+For our system to work, we need to create a program called rviz_click_to_2d.cpp that subscribes to the two topics above and converts that data into a format that other programs in a ROS-based robotic system can use. In other words, we need to create a ROS node that can publish to the following topics:
+
+    /initial_2d topic (which the odometry publisher subscribes to) (geometry_msgs/PoseStamped)
+    /goal_2d topic (which our path planner node, which I’ll create in a later tutorial, will subscribe to). (geometry_msgs/PoseStamped)
+
+We will name our ROS node, rviz_click_to_2d.cpp. When this program is running, you can click the 2D Pose Estimate button and the 2D Nav Goal button in RViz, and rviz_click_to_2d.cpp will convert the data to the appropriate format to publish on the /initial_2d and /goal_2d topics.
+
+
+
